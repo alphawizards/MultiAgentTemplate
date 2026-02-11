@@ -1,5 +1,5 @@
 ---
-description: Build the codebase based on the plan
+description: Implement the plan
 argument-hint: [path-to-plan]
 ---
 
@@ -13,10 +13,9 @@ PATH_TO_PLAN: $ARGUMENTS
 
 ## Workflow
 
-- If no `PATH_TO_PLAN` is provided, STOP immediately and ask the user to provide it.
-- Read the plan at `PATH_TO_PLAN`. Ultrathink about the plan and implement it into the codebase.
+- If no `PATH_TO_PLAN` is provided, STOP immediately and ask the user to provide it (AskUserQuestion).
+- Read and execute the plan at `PATH_TO_PLAN`. Think hard about the plan and implement it into the codebase.
 
 ## Report
 
-- Summarize the work you've just done in a concise bullet point list.
-- Report the files and total lines changed with `git diff --stat`
+- Present the `## Report` section of the plan.
