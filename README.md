@@ -1,3 +1,14 @@
+# Universal Multi-Agent Template (Mastery + Superpowers + Observability)
+
+**👋 Start Here:** Read the [USER_GUIDE.md](USER_GUIDE.md) for detailed instructions on using this template.
+
+This template integrates:
+1.  **[Bi-Directional Observability](https://github.com/disler/claude-code-hooks-multi-agent-observability)**: Real-time dashboard for agent builds.
+2.  **[Hook Mastery](https://github.com/disler/claude-code-hooks-mastery)**: Advanced security, team agents, and planning commands.
+3.  **[Superpowers](https://github.com/obra/superpowers)**: Methodologies for TDD, debugging, and brainstorming.
+
+---
+
 # Multi-Agent Observability System
 
 Real-time monitoring and visualization for Claude Code agents through comprehensive hook event tracking. Watch the [latest deep dive on multi-agent orchestration with Opus 4.6 here](https://youtu.be/RpUTF_U4kiw). With Claude Opus 4.6 and multi-agent orchestration, you can now spin up teams of specialized agents that work in parallel, and this observability system lets you trace every tool call, task handoff, and agent lifecycle event across the entire swarm.
