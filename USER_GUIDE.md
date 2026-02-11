@@ -121,6 +121,148 @@ If you report a bug, the agent uses `skills/systematic-debugging`.
 ### 🌳 Git Worktrees
 For complex tasks, the agent can use `skills/using-git-worktrees` to create a temporary, isolated environment. This keeps your main branch clean while the agent experiments.
 
+### 📋 Full Skills Library
+
+| Skill | Purpose | Used By |
+| :--- | :--- | :--- |
+| `brainstorming` | Turn ideas into designs before coding | Frontend, Backend |
+| `test-driven-development` | Red/Green/Refactor cycle | Backend, QA, Debugger |
+| `systematic-debugging` | 4-phase root cause analysis | Debugger |
+| `verification-before-completion` | Evidence before claims | ALL agents |
+| `writing-plans` | Create bite-sized implementation plans | Frontend, Backend, DevOps |
+| `executing-plans` | Follow plans task-by-task | Backend |
+| `dispatching-parallel-agents` | Run independent tasks concurrently | Debugger |
+| `finishing-a-development-branch` | Verify → Options → Merge/PR | DevOps |
+| `using-git-worktrees` | Isolated workspaces for experiments | DevOps |
+| `requesting-code-review` | Dispatch code reviewer after work | QA |
+| `receiving-code-review` | Evaluate feedback technically | Frontend, Backend |
+| `subagent-driven-development` | Fresh subagent per task | ALL (orchestration) |
+| `agent-sandbox-skill` | Run untrusted code safely | DevOps |
+
+---
+
+## 🏗️ Specialist Sub-Agents
+
+Instead of using the generic `builder` for all tasks, this template includes **5 specialist agents**, each tuned for a specific domain. They have pre-configured skill loading, domain-specific hooks, and unique colour coding in the Observability dashboard.
+
+### How to Dispatch a Specialist
+
+Inside Claude Code, use the `/agent run` command:
+
+```bash
+# Frontend work
+/agent run frontend-engineer "Build the dashboard sidebar component with responsive layout"
+
+# Backend work
+/agent run backend-engineer "Create the /api/v1/users endpoint with Pydantic validation"
+
+# DevOps work
+/agent run devops-engineer "Write a GitHub Actions workflow for CI/CD"
+
+# Testing / Verification
+/agent run qa-engineer "Write unit tests for the user authentication module"
+
+# Debugging
+/agent run debugger "Fix the NaN error on the Liabilities page"
+```
+
+### 🟣 Frontend Engineer
+**File**: `.claude/agents/team/frontend-engineer.md` | **Colour**: Magenta
+
+**Domain**: UI components, styling, responsive layouts, accessibility, client-side interactivity.
+
+**Skills Loaded**:
+| Skill | Why |
+| :--- | :--- |
+| `brainstorming` | Explore layout options and interaction patterns before coding |
+| `writing-plans` | Break multi-step UI work into component-level tasks |
+| `verification-before-completion` | Run dev server and visually confirm output |
+| `receiving-code-review` | Evaluate review feedback technically |
+
+**Guardrails**: Cannot modify backend logic, API routes, or database schemas.
+
+---
+
+### 🟢 Backend Engineer
+**File**: `.claude/agents/team/backend-engineer.md` | **Colour**: Green
+
+**Domain**: APIs, database schemas, server logic, data processing, integrations.
+
+**Skills Loaded**:
+| Skill | Why |
+| :--- | :--- |
+| `test-driven-development` | ALL backend logic follows Red/Green/Refactor |
+| `executing-plans` | Follow implementation plans task-by-task |
+| `verification-before-completion` | Run tests and confirm pass/fail output |
+| `receiving-code-review` | Evaluate review feedback technically |
+
+**Guardrails**: Cannot modify frontend components or UI styling. Uses `Decimal` for financial logic. Validates all inputs with Pydantic/Zod.
+
+---
+
+### 🔵 DevOps Engineer
+**File**: `.claude/agents/team/devops-engineer.md` | **Colour**: Blue
+
+**Domain**: CI/CD pipelines, Docker, infrastructure-as-code, deployments, environment config, git workflows.
+
+**Skills Loaded**:
+| Skill | Why |
+| :--- | :--- |
+| `using-git-worktrees` | Create isolated environments for deployment testing |
+| `finishing-a-development-branch` | Verify tests → Present options → Execute merge/PR |
+| `verification-before-completion` | Run deployment verification commands |
+| `writing-plans` | Plan multi-step infrastructure changes |
+
+**Guardrails**: Cannot modify application business logic or UI. Always provides verification CLI commands. Updates `.env.example` when adding new env vars.
+
+---
+
+### 🟡 QA Engineer
+**File**: `.claude/agents/team/qa-engineer.md` | **Colour**: Yellow
+
+**Domain**: Test writing, acceptance criteria verification, regression testing, specification validation.
+
+**Skills Loaded**:
+| Skill | Why |
+| :--- | :--- |
+| `test-driven-development` | Strict Red/Green/Refactor for every test |
+| `verification-before-completion` | Run EVERY test command and read FULL output |
+| `requesting-code-review` | Dispatch code review to validate test quality |
+| `receiving-code-review` | Evaluate feedback on test design |
+
+**Guardrails**: Tests verify BEHAVIOUR, not implementation. Covers edge cases (null, empty, boundaries). Runs the full test suite after every change.
+
+---
+
+### 🔴 Debugger
+**File**: `.claude/agents/team/debugger.md` | **Colour**: Red
+
+**Domain**: Root cause analysis, hypothesis testing, targeted fixes, regression prevention.
+
+**Skills Loaded**:
+| Skill | Why |
+| :--- | :--- |
+| `systematic-debugging` | MANDATORY 4-phase process: Investigate → Pattern → Hypothesis → Verify |
+| `verification-before-completion` | Run reproduction script AFTER fix |
+| `test-driven-development` | Write regression test BEFORE applying fix |
+| `dispatching-parallel-agents` | If multiple independent bugs, dispatch separate agents |
+
+**Guardrails**: ONE fix at a time. Never stacks fixes. After 3 failed attempts, stops and escalates to user. Always writes a regression test.
+
+---
+
+### Agent Summary Table
+
+| Agent | Colour | Primary Skills | Use Case |
+| :--- | :--- | :--- | :--- |
+| `frontend-engineer` | 🟣 Magenta | brainstorming, writing-plans | UI, components, styling |
+| `backend-engineer` | 🟢 Green | TDD, executing-plans | APIs, schemas, server logic |
+| `devops-engineer` | 🔵 Blue | git-worktrees, finishing-branch | CI/CD, Docker, deployments |
+| `qa-engineer` | 🟡 Yellow | TDD, verification, code-review | Tests, acceptance criteria |
+| `debugger` | 🔴 Red | systematic-debugging, TDD | Bug fixing, root cause analysis |
+| `builder` | 🔵 Cyan | (generic) | General-purpose coding |
+| `validator` | 🟡 Yellow | (read-only) | Inspects work without modifying |
+
 ---
 
 ## 📊 Observability Deep Dive
@@ -173,7 +315,9 @@ The `Justfile` is your control center. Here are the commands:
 ## 📂 Key Files & Folders
 
 *   **`.claude/hooks/`**: The Python scripts that intercept agent actions (Security, Logging).
-*   **`.claude/agents/`**: Prompt definitions for specialized agents (`builder.md`, `validator.md`).
-*   **`skills/`**: The knowledge base your agents pull from (`TDD`, `Debugging`).
+*   **`.claude/agents/team/`**: Specialist agents — `frontend-engineer`, `backend-engineer`, `devops-engineer`, `qa-engineer`, `debugger`, plus the generic `builder` and `validator`.
+*   **`.claude/agents/code-reviewer.md`**: The standalone code review agent.
+*   **`.claude/commands/`**: Custom slash commands like `/plan_w_team`.
+*   **`skills/`**: The Superpowers library (13 skills including `TDD`, `Debugging`, `Brainstorming`, etc.).
 *   **`apps/`**: Source code for the Observability Server and Dashboard.
 *   **`specs/`**: Where the agent stores its Plans and Design Docs.
